@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Class.js Tests</title>
+		<script src="function.js"></script>
+		<script src="object.js"></script>
+		<script src="class.js"></script>
+		<script>
+			var failed = passed = 0;
+
+			function assert(message, actual, expected) {
+				message += ": ";
+				if(actual == expected) {
+					passed++;
+					message += "PASS";
+				} else {
+					failed++;
+					message += "FAIL - expected: " + expected + ", actual: " + actual;
+				}
+				console.log(message);
+			}
+
+			var A = Class({
+				initialize: function() {
+					return "A";
+				},
+				c: "a"
+			});
+
+			var B = Class(A, {
+				initialize: function() {
+					this.test = this.super() + "B";
+				},
+				get c() {
+					return this.super() + "b";
+				}
+			});
+
+			B.mixin({
+				classVar: 1337
+			});
+
+			var b = new B();
+
+			assert("Initialize with super", b.test, "AB");
+			assert("Getter with super value", b.c, "ab");
+			assert("Class var", B.classVar, 1337);
+
+			console.log("============================");
+			console.log("Passed " + passed + " tests.");
+			console.log("Failed " + failed + " tests.");
+		</script>
+	</head>
+	<body>
+		
+	</body>
+</html>

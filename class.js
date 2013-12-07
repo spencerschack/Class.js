@@ -5,67 +5,70 @@
  * 
  * Usage:
  * -----------------------------------------------------------------------------
-   var Animal = Class({
+    var Animal = Class({
      
-     type: "Mammal", // Instance variable.
+        type: "Mammal", // Instance variable.
+   
+        speak: function() { // Instance method.
+	    	return "I am a ";
+        }        
 
-     speak: function() { // Instance method.
-           return "I am a ";
-     }        
+    }).mixin({
 
-   }).extend({
+     	count: 0, // Class variable.
 
-     count: 0, // Class variable.
+     	find: function() { // Class method.
+       		// ...
+     	}
 
-     find: function() { // Class method.
-       // ...
-     }
+    });
+    var Dog = Class(Animal, {
 
-   });
-   var Dog = Class(Animal, {
+	    _name: "Dog", // Private instance variable (by convention).
 
-            _name: "Dog", // Private instance variable (by convention).
+    	speak: function() {
+    		return this.super() + "dog";
+    	},
 
-     speak: function() {
-       return this._super() + "dog";
-     },
+    	get name() {
+    		return this._name;
+    	},
 
-     get name() {
-       return this._name;
-     },
-
-     set name(value) {
-       this._name = value;
-       return this.name;
-     }
-   });
+    	set name(value) {
+    		this._name = value;
+    		return this.name;
+    	}
+    });
  * 
- * @param {...Object} [parent] - A super class.
+ * @param {...Object} [parents] - Super classes.
  * @param {Object} obj - The attribute and methods definitions.
  */
 var Class = function() {
 
-        var args        = [].slice.call(arguments)
-          , obj         = args[args.length - 1] || {}
-          , parents     = args.slice(0, -1)
-          , constructor;
+	var args    = [].slice.call(arguments)
+	  , obj     = args[args.length - 1] || {}
+	  , parents = args.slice(0, -1)
+	  , constructor;
 
-        if(obj.initialize) {
-                constructor = function() {
-                        obj.initialize.apply(this, arguments);
-                };
-        } else {
-                constructor = function() {};
-        }
+	if(parents.length) {
+		if(!obj.initialize) {
+			obj.initialize = function() {
+				this.super.apply(this, arguments);
+			}
+		}
+		constructor = function() {
+			this.initialize.apply(this, arguments);
+		}
+	} else {
+		constructor = function() { };
+	}
 
-        constructor.prototype = obj;
-        constructor.constructor = constructor;
-        parents.forEach(function(parent) {
-                constructor.mixin(parent);
-                constructor.prototype.mixin(parent.prototype);
-                constructor.constructor = constructor.constructor.wrapSuper(parent.constructor);
-        });
+	constructor.prototype = obj;
+	parents.forEach(function(parent) {
+		constructor.mixin(parent);
+		constructor.prototype.mixin(parent.prototype);
+	});
 
-        return constructor;
+	return constructor;
 
 }
