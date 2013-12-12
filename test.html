@@ -2,8 +2,6 @@
 <html>
 	<head>
 		<title>Class.js Tests</title>
-		<script src="function.js"></script>
-		<script src="object.js"></script>
 		<script src="class.js"></script>
 		<script>
 			var failed = passed = 0;
@@ -21,6 +19,9 @@
 			}
 
 			var A = Class({
+				returnChild: function() {
+					return this.child();
+				},
 				initialize: function() {
 					return "A";
 				},
@@ -28,6 +29,7 @@
 			});
 
 			var B = Class(A, {
+				child: function() { return "child"; },
 				initialize: function() {
 					this.test = this.super() + "B";
 				},
@@ -45,6 +47,7 @@
 			assert("Initialize with super", b.test, "AB");
 			assert("Getter with super value", b.c, "ab");
 			assert("Class var", B.classVar, 1337);
+			assert("Super method accesses child property", b.returnChild(), "child");
 
 			console.log("============================");
 			console.log("Passed " + passed + " tests.");
